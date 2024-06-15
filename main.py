@@ -1,8 +1,23 @@
 import time
 import os
+import random
 
-board_matrix = [[" " for i in range(3)] for j in range(3)]
-current_player = ""
+
+GAME_OPTIONS = {
+    1: "Single Player",
+    2: "Multiplayer",
+    3: "Help",
+    4: "Exit"
+}
+
+
+GAME_OPTIONS_SCREEN = "\n".join(f"{k}. {v}" for k, v in GAME_OPTIONS.items())
+
+
+def reset_board_matrix():
+    global board_matrix
+    board_matrix = [[" " for i in range(3)] for j in range(3)]
+
 
 def print_board():
     os.system('clear')
@@ -16,6 +31,7 @@ def update_board(row, col, player):
         print_board()
     else:
         print("Invalid move. Try again!")
+
 
 def check_winner(player):
     # Check rows
@@ -56,9 +72,31 @@ def get_row_col():
             print("Invalid move. Try again!") 
         else:
             return row, col
-        
 
-def play_game():
+
+def get_bot_move():
+    while True:
+        time.sleep(1)
+        row = random.randint(0, 2)
+        col = random.randint(0, 2)
+        if board_matrix[row][col] == " ":
+            return row, col
+
+
+def get_game_options():
+    os.system('clear')
+    print(GAME_OPTIONS_SCREEN)
+
+    while True:
+        choice = int(input("Select from options: "))
+        if choice < 1 or choice > 4:
+            print("Invalid choice. Try again!")
+        else:
+            os.system('clear')
+            return choice
+
+
+def multi_player_game():
     current_player = get_initial_player()
     print_board()
 
@@ -72,6 +110,43 @@ def play_game():
             break
 
         current_player = "X" if current_player == "O" else "O"
+
+
+def single_player_game():
+    player_choice = get_initial_player()
+    print_board()
+    current_player = player_choice
+
+    while True:
+        print("Current Player: ", current_player)
+
+        if current_player == player_choice:
+            row, col = get_row_col()
+        else:
+            row, col = get_bot_move()
+
+        update_board(row, col, current_player)
+
+        if check_winner(current_player):
+            print("Player ", current_player, " wins!")
+            time.sleep(2)
+            break
+
+        current_player = "X" if current_player == "O" else "O"
+
+
+def play_game():
+    while True:
+        option = get_game_options()
+
+        reset_board_matrix()
+        if GAME_OPTIONS[option] == "Single Player":
+            single_player_game()
+        elif GAME_OPTIONS[option] == "Multiplayer":
+            multi_player_game()
+        if GAME_OPTIONS[option] == "Exit":
+            break
+
 
 if __name__ == "__main__":
     play_game()
