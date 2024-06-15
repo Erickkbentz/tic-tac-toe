@@ -60,6 +60,7 @@ def get_row_col():
 
 def play_game():
     current_player = get_initial_player()
+    print_board()
 
     while True:
         print("Current Player: ", current_player)
