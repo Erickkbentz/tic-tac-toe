@@ -1,5 +1,6 @@
 import pygame
 import time
+import random
 
 # pygame setup
 pygame.init()
@@ -25,6 +26,14 @@ cell_colors = [
     [(255, 255, 255) for _ in range(grid_size)] for _ in range(grid_size)
 ]  # initialisze with white color
 pygame.display.set_caption("Tic Tac Toe")
+
+
+def get_bot_move():
+    while True:
+        row = random.randint(0, 2)
+        col = random.randint(0, 2)
+        if cell_states[row][col] == 0:
+            return row, col
 
 
 def menu_button(
@@ -111,26 +120,52 @@ def reset_game():
     cell_colors = [
         [(255, 255, 255) for _ in range(grid_size)] for _ in range(grid_size)
     ]  # initialize with white color
+    global current_player
+    current_player = 1
 
 
 def single_player_game():
     reset_game()
     global current_player
+    win = False
 
     while True:
         clicked = False
+        if win:
+            time.sleep(2)
+            reset_game()
+            win = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:  # A mouse click has occurred
-                mouse_x, mouse_y = event.pos
                 clicked = pygame.mouse.get_pressed()
-                if (
-                    start_x <= mouse_x <= start_x + cell_size * grid_size
-                    and start_y <= mouse_y <= start_y + cell_size * grid_size
-                ):
-                    update_board(mouse_x, mouse_y)
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if (
+            start_x <= mouse_x <= start_x + cell_size * grid_size
+            and start_y <= mouse_y <= start_y + cell_size * grid_size
+        ):
+            cell_x = (mouse_x - start_x) // cell_size
+            cell_y = (mouse_y - start_y) // cell_size
+
+            if current_player == 1 and clicked and not win:
+                print("Player 1")
+                update_board(cell_x, cell_y, current_player)
+                win = check_winner(current_player)
+
+                current_player = 2
+
+        if current_player == 2 and not clicked and not win:
+            print("Player 2")
+            cell_x, cell_y = get_bot_move()
+            time.sleep(1)
+            update_board(cell_x, cell_y, current_player)
+            win = check_winner(current_player)
+
+            current_player = 1
 
         screen.fill("white")
 
@@ -152,31 +187,30 @@ def single_player_game():
         clock.tick(60)
 
 
-def update_board(mouse_x, mouse_y):
-    global current_player
-    cell_x = (mouse_x - start_x) // cell_size
-    cell_y = (mouse_y - start_y) // cell_size
+def update_board(cell_x, cell_y, current_player):
     if cell_states[cell_x][cell_y] == 0:
         cell_states[cell_x][cell_y] = current_player
-
-    current_player = 2 if current_player == 1 else 1
 
 
 def check_winner(player):
     # Check rows
     for i in range(3):
         if cell_states[i][0] == cell_states[i][1] == cell_states[i][2] == player:
+            print(f"Player {player} wins!")
             return True
 
     # Check columns
     for i in range(3):
         if cell_states[0][i] == cell_states[1][i] == cell_states[2][i] == player:
+            print(f"Player {player} wins!")
             return True
 
     # Check diagonals
     if cell_states[0][0] == cell_states[1][1] == cell_states[2][2] == player:
+        print(f"Player {player} wins!")
         return True
     if cell_states[0][2] == cell_states[1][1] == cell_states[2][0] == player:
+        print(f"Player {player} wins!")
         return True
 
     return False
@@ -188,12 +222,9 @@ def multi_player_game():
 
     while True:
         clicked = False
-        if check_winner(1):
-            print("Player 1 wins!")
-            time.sleep(2)
-            reset_game()
-        elif check_winner(2):
-            print("Player 2 wins!")
+        win = False
+
+        if win:
             time.sleep(2)
             reset_game()
 
@@ -207,8 +238,18 @@ def multi_player_game():
                 if (
                     start_x <= mouse_x <= start_x + cell_size * grid_size
                     and start_y <= mouse_y <= start_y + cell_size * grid_size
+                    and current_player == 1
                 ):
-                    update_board(mouse_x, mouse_y)
+                    cell_x = (mouse_x - start_x) // cell_size
+                    cell_y = (mouse_y - start_y) // cell_size
+                    if current_player == 1 and clicked and not win:
+                        update_board(cell_x, cell_y, current_player)
+                        win = check_winner(current_player)
+                        current_player = 2
+                    elif current_player == 2 and clicked and not win:
+                        update_board(cell_x, cell_y, current_player)
+                        win = check_winner(current_player)
+                        current_player = 1
 
         screen.fill("white")
 
