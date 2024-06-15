@@ -3,12 +3,7 @@ import os
 import random
 
 
-GAME_OPTIONS = {
-    1: "Single Player",
-    2: "Multiplayer",
-    3: "Help",
-    4: "Exit"
-}
+GAME_OPTIONS = {1: "Single Player", 2: "Multiplayer", 3: "Help", 4: "Exit"}
 
 
 GAME_OPTIONS_SCREEN = "\n".join(f"{k}. {v}" for k, v in GAME_OPTIONS.items())
@@ -20,7 +15,7 @@ def reset_board_matrix():
 
 
 def print_board():
-    os.system('clear')
+    os.system("clear")
     for row in board_matrix:
         print("|" + "|".join(row) + "|")
 
@@ -38,7 +33,7 @@ def check_winner(player):
     for i in range(3):
         if board_matrix[i][0] == board_matrix[i][1] == board_matrix[i][2] == player:
             return True
-    
+
     # Check columns
     for i in range(3):
         if board_matrix[0][i] == board_matrix[1][i] == board_matrix[2][i] == player:
@@ -69,7 +64,7 @@ def get_row_col():
         if row < 0 or row > 2 or col < 0 or col > 2:
             print("Invalid row or column. Try again!")
         elif board_matrix[row][col] != " ":
-            print("Invalid move. Try again!") 
+            print("Invalid move. Try again!")
         else:
             return row, col
 
@@ -84,7 +79,7 @@ def get_bot_move():
 
 
 def get_game_options():
-    os.system('clear')
+    os.system("clear")
     print(GAME_OPTIONS_SCREEN)
 
     while True:
@@ -92,7 +87,7 @@ def get_game_options():
         if choice < 1 or choice > 4:
             print("Invalid choice. Try again!")
         else:
-            os.system('clear')
+            os.system("clear")
             return choice
 
 
